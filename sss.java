@@ -12,7 +12,6 @@ public class StepResponseSystem extends JPanel {
         double dt = 0.01;
         double tEnd = 20;
 
-        // состояния
         double w2_1 = 0;
         double w2_2 = 0;
         double w3 = 0;
@@ -21,12 +20,8 @@ public class StepResponseSystem extends JPanel {
 
         for (double t = 0; t < tEnd; t += dt) {
 
-            double r = 1; // вход — единичный скачок
-
-            // обратная связь
+            double r = 1;
             double feedback = 0.2 * y;
-
-            // ошибка
             double e = r - feedback;
 
             // W2 = 0.2/(2p+1)^2
@@ -45,6 +40,12 @@ public class StepResponseSystem extends JPanel {
             time.add(t);
             output.add(y);
         }
+
+        // ===== ЛИСТИНГ =====
+        System.out.println("t\t y(t)");
+        for (int i = 0; i < time.size(); i += 20) {
+            System.out.printf("%.2f\t %.4f\n", time.get(i), output.get(i));
+        }
     }
 
     @Override
@@ -54,18 +55,41 @@ public class StepResponseSystem extends JPanel {
         int w = getWidth();
         int h = getHeight();
 
-        g.drawLine(50, h - 50, w - 50, h - 50);
-        g.drawLine(50, 50, 50, h - 50);
+        int x0 = 60;
+        int y0 = h - 60;
 
+        // оси
+        g.drawLine(x0, y0, w - 40, y0);
+        g.drawLine(x0, 40, x0, y0);
+
+        // метки по времени
+        for (int i = 0; i <= 20; i += 2) {
+            int x = x0 + i * 30;
+            g.drawLine(x, y0 - 5, x, y0 + 5);
+            g.drawString(Integer.toString(i), x - 5, y0 + 20);
+        }
+
+        // метки по Y
+        for (int i = 0; i <= 5; i++) {
+            int y = y0 - i * 40;
+            g.drawLine(x0 - 5, y, x0 + 5, y);
+            g.drawString(String.format("%.1f", (double)i), x0 - 40, y + 5);
+        }
+
+        // график
         for (int i = 1; i < time.size(); i++) {
-            int x1 = 50 + (int)(time.get(i-1) * 30);
-            int y1 = h - 50 - (int)(output.get(i-1) * 40);
+            int x1 = x0 + (int)(time.get(i-1) * 30);
+            int y1 = y0 - (int)(output.get(i-1) * 40);
 
-            int x2 = 50 + (int)(time.get(i) * 30);
-            int y2 = h - 50 - (int)(output.get(i) * 40);
+            int x2 = x0 + (int)(time.get(i) * 30);
+            int y2 = y0 - (int)(output.get(i) * 40);
 
             g.drawLine(x1, y1, x2, y2);
         }
+
+        g.drawString("t", w - 30, y0 + 20);
+        g.drawString("y(t)", x0 - 40, 30);
+        g.drawString("Переходный процесс", w/2 - 60, 20);
     }
 
     public static void main(String[] args) {
@@ -73,7 +97,7 @@ public class StepResponseSystem extends JPanel {
         panel.simulate();
 
         JFrame frame = new JFrame("Переходный процесс системы");
-        frame.setSize(800, 600);
+        frame.setSize(900, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(panel);
         frame.setVisible(true);
